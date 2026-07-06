@@ -1,9 +1,9 @@
-import fitz
+import pymupdf
 from langchain_core.documents import Document
 
 
 def extract_pdf_documents(path: str) -> list[Document]:
-    pdf = fitz.open(path)
+    pdf = pymupdf.open(path)
     documents: list[Document] = []
     try:
         for index, page in enumerate(pdf, start=1):
