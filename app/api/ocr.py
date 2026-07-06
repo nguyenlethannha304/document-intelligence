@@ -1,17 +1,20 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 
 from app.core.exceptions import OCRPlatformError
 from app.models.result import OCRResult
 from app.pipeline.orchestrator import OCRPipeline
+from app.storage.local import save_upload
 
 router = APIRouter(tags=["ocr"])
 pipeline = OCRPipeline()
 
 
 @router.post("/ocr", response_model=OCRResult)
-def run_ocr(path: str = Query(...), engine: str = Query("azure_document_intelligence")) -> OCRResult:
+async def run_ocr(file: UploadFile = File(...), engine: str = Query("tesseract")) -> OCRResult:
+    _, storage_path = await save_upload(file)
+
     try:
-        state = pipeline.run(source_path=path, engine=engine)
+        state = pipeline.run(source_path=str(storage_path), engine=engine)
     except OCRPlatformError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -20,6 +23,6 @@ def run_ocr(path: str = Query(...), engine: str = Query("azure_document_intellig
         source_path=state["source_path"],
         engine=state["ocr_engine"],
         page_count=len(state["pages"]),
-        text=state.get("text_dict", {}).get("markdown") or state.get("text_dict", {}).get("raw", ""),
+        text=state.get("text", ""),
         status=state["status"],
     )
