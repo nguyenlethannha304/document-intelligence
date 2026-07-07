@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  ocr-service:
+    build:
+      context: tesseract-ocr
+      dockerfile: Dockerfile
+    container_name: ocr-service
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+
+  # app-client:
+  #   image: python:3.11-slim
+  #   container_name: app-client
+  #   working_dir: /app
+  #   volumes:
+  #     - ./client:/app
+  #   command: >
+  #     sh -c "pip install --no-cache-dir requests &&
+  #            python client.py"
+  #   depends_on:
+  #     - ocr-service
