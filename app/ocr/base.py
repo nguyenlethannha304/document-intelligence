@@ -13,12 +13,12 @@ class BaseOCREngine(ABC):
 
 @lru_cache(maxsize=2)
 def get_ocr_engine(name: str) -> BaseOCREngine:
-    from app.ocr.azure_document_intelligence import AzureDocumentIntelligenceEngine
+    from app.ocr.llm_ocr import LLMOCREngine
     from app.ocr.tesseract_ocr import TesseractOCREngine
 
     engines: dict[str, BaseOCREngine] = {
         "tesseract": TesseractOCREngine(),
-        "azure_document_intelligence": AzureDocumentIntelligenceEngine(),
+        "llm_ocr": LLMOCREngine(),
     }
     try:
         return engines[name]

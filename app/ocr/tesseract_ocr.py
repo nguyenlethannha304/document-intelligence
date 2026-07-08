@@ -30,11 +30,10 @@ class TesseractOCREngine(BaseOCREngine):
         if response.status_code == 200:
             payload = response.json()
             print(f"OCR result for page {page_index}: {payload}")
+            page.page_content = payload.get("text", "")
+            page.metadata["avg_confidence"] = payload.get("avg_confidence", 0)
             if payload.get("avg_confidence", 0) > 80:
-                page.page_content = payload.get("text", "")
                 page.metadata["ocr_needed"] = False
-            else:
-                page.metadata["ocr_needed"] = True
         else:
             print(f"Error during OCR: {response.status_code} - {response.text}")
         return page

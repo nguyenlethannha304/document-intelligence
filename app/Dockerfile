@@ -4,6 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 
+RUN mkdir /data
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -15,8 +16,6 @@ COPY ./pdf_requirements.txt /tmp/pdf_requirements.txt
 
 RUN pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt -r /tmp/pdf_requirements.txt
-
-RUN mkdir /data
 
 COPY ./ /app/app
 
