@@ -3,6 +3,7 @@ from app.pipeline.state import PipelineState
 
 
 def postprocess_text(state: PipelineState) -> PipelineState:
-    text = state.get("text", "")
-    markdown_text = to_markdown(text).strip()
-    return {"text": text, "markdown": markdown_text, "status": "postprocessed"}
+    for page in state["pages"]:
+        text = to_markdown(page.page_content)
+        state["text"] += text
+    return {"text": state["text"], "status": "postprocessed"}

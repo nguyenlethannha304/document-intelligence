@@ -21,7 +21,7 @@ async def run_ocr(file: UploadFile = File(...), engine: str = Query("tesseract")
     return OCRResult(
         document_id=state["document_id"],
         source_path=state["source_path"],
-        engine=state["ocr_engine"],
+        engine=state.get("ocr_engine", engine),
         page_count=len(state["pages"]),
         text=state.get("text", ""),
         status=state["status"],

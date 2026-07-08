@@ -1,8 +1,8 @@
 from app.extractors.pdf.pymupdf import extract_pdf_documents
 from app.pipeline.state import PipelineState
-from app.core.exceptions import ScannedPageError
 
 def extract_pages(state: PipelineState) -> PipelineState:
+    """Extracts pages from the document based on its type and updates the pipeline state accordingly."""
     if state.get("document_type") == "pdf":
         documents = extract_pdf_documents(state["source_path"])
         return {

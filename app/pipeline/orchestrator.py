@@ -38,4 +38,4 @@ class OCRPipeline:
             "pages": [],
             "text": "",
         }
-        return self.get_graph().invoke(initial_state)
+        return self.graph.invoke(initial_state)

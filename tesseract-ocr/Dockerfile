@@ -31,8 +31,5 @@ RUN pip install --upgrade pip setuptools wheel && \
 # Copy application code
 COPY . /app
 
-# Service port
-EXPOSE 8080
-
 # Run FastAPI
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

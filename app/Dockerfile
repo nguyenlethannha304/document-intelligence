@@ -16,10 +16,8 @@ COPY ./pdf_requirements.txt /tmp/pdf_requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt -r /tmp/pdf_requirements.txt
 
-COPY ./ /app
+COPY ./ /app/app
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/app
 
-EXPOSE 8000
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--workers", "1"]

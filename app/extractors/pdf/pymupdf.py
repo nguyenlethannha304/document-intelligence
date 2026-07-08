@@ -1,5 +1,4 @@
 import pymupdf
-from PIL import Image
 from langchain_core.documents import Document
 
 def _bboxes_intersect(a: tuple, b: tuple) -> bool:
@@ -21,30 +20,30 @@ def _table_to_markdown(rows: list[list]) -> str:
     return "\n".join(lines)
 
 def _convert_page_to_image(index, page) -> Document:
-    # convert the page to an image and mark it for OCR processing
-    page = page.get_pixmap(dpi=150)
-    img = Image.frombytes("RGB", [page.width, page.height], page.samples)
+    pix = page.get_pixmap(dpi=150, alpha=False)
+    image_bytes = pix.tobytes("png")  # real PNG file bytes, good for multipart UploadFile
+
     return Document(
-        page_content=img.tobytes(),
+        page_content="",
         metadata={
             "page": index,
             "source": page.parent.name,
             "num_tables": 0,
             "ocr_needed": True,
+            "filename": f"page_{index}.png",
+            "content_type": "image/png",
+            "image_bytes": image_bytes,
         },
     )
 
 def extract_pdf_documents(path: str) -> list[Document]:
     """
     Extract text and tables (as markdown) from each page of a PDF using pymupdf.
-
-    Raises:
-        ScannedPageError: if a page contains an embedded image (e.g. a scan,
-            photo, logo) or otherwise yields no extractable text/tables.
-            Such pages should be routed to an OCR pipeline instead.
+    If a page has no text or tables, it is converted to an image and marked for OCR.
+    Returns a list of Document objects, one for each page.
     """
     documents: list[Document] = []
-
+    print(f"Extracting pages from PDF: {path}")
     with pymupdf.open(path) as pdf:
         for index, page in enumerate(pdf, start=1):
             # Any embedded image disqualifies the page (treat as scan/image page)
@@ -78,7 +77,6 @@ def extract_pdf_documents(path: str) -> list[Document]:
             if not page_content:
                 documents.append(_convert_page_to_image (index, page))
                 continue
-
             documents.append(
                 Document(
                     page_content=page_content,
@@ -90,5 +88,4 @@ def extract_pdf_documents(path: str) -> list[Document]:
                     },
                 )
             )
-
     return documents

@@ -3,17 +3,15 @@ from app.pipeline.state import PipelineState
 
 
 def run_ocr_stage(state: PipelineState) -> PipelineState:
+    """Runs OCR on the pages in the pipeline state using the specified OCR engine."""
     if state.get("ocr_needed") is False:
-        return {"status": "ocr_skipped"}
+        return {"pages": state["pages"], "status": "ocr_skipped"}
     elif state.get("document_type") in ["pdf"]:
-        for page in state["pages"]:
+        engine = get_ocr_engine(state.get("ocr_engine", "tesseract"))
+        for idx, page in enumerate(state["pages"]):
             if page.metadata.get("ocr_needed", False) is False:
                 continue
-            else:
-                for ocr_engine in ["tesseract", "azure_document_intelligence"]:
-                    engine = get_ocr_engine(state[ocr_engine])
-                    page = engine.extract_text(page)
-                    state["pages"][page.page_number - 1] = page
+            state["pages"][idx] = engine.extract_text(page)
     return {
         "pages": state["pages"],
         "status": "ocr_completed",

@@ -11,9 +11,9 @@ configure_logging()
 settings = get_settings()
 
 app = FastAPI(title=settings.app_name, version=settings.app_version)
-app.include_router(upload_router, prefix="/api")
+# app.include_router(upload_router, prefix="/api")
 app.include_router(ocr_router, prefix="/api")
-app.include_router(jobs_router, prefix="/api")
+# app.include_router(jobs_router, prefix="/api")
 
 
 @app.get("/health", tags=["system"])
