@@ -10,18 +10,18 @@ pipeline = OCRPipeline()
 
 
 @router.post("/ocr", response_model=OCRResult)
-async def run_ocr(file: UploadFile = File(...), engine: str = Query("tesseract")) -> OCRResult:
+async def run_ocr(file: UploadFile = File(...)) -> OCRResult:
     _, storage_path = await save_upload(file)
 
     try:
-        state = pipeline.run(source_path=str(storage_path), engine=engine)
+        state = pipeline.run(source_path=str(storage_path))
     except OCRPlatformError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return OCRResult(
         document_id=state["document_id"],
         source_path=state["source_path"],
-        engine=state.get("ocr_engine", engine),
+        engine=state.get("ocr_engine", ""),
         page_count=len(state["pages"]),
         text=state.get("text", ""),
         status=state["status"],

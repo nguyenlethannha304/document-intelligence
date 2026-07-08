@@ -15,6 +15,11 @@ async def save_upload(file: UploadFile) -> tuple[str, Path]:
     target_path.write_bytes(content)
     return document_id, target_path
 
+def save_text_output_to_file(document_id: str, text: str) -> Path:
+    settings = get_settings()
+    target_path = settings.output_dir / f"{document_id}.md"
+    target_path.write_text(text, encoding="utf-8")
+    return target_path
 
 def write_text_output(document_id: str, text: str) -> Path:
     settings = get_settings()
