@@ -10,9 +10,10 @@ def run_ocr_stage(state: PipelineState) -> PipelineState:
             if page.metadata.get("ocr_needed", False) is False:
                 continue
             else:
-                engine = get_ocr_engine(state["ocr_engine"])
-                text = engine.extract_text(page)
-                state["pages"][page.page_number - 1].text = text
+                for ocr_engine in ["tesseract", "azure_document_intelligence"]:
+                    engine = get_ocr_engine(state[ocr_engine])
+                    page = engine.extract_text(page)
+                    state["pages"][page.page_number - 1] = page
     return {
         "pages": state["pages"],
         "status": "ocr_completed",

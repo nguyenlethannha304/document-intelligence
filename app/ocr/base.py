@@ -4,19 +4,19 @@ from langchain_core.documents import Document
 
 from app.core.exceptions import OCRPlatformError
 
-
 class BaseOCREngine(ABC):
     name: str
-
     @abstractmethod
-    def extract_text(self, pages: list[Document]) -> str:
+    def extract_text(self, page: Document) -> Document:
         raise NotImplementedError
 
 
 def get_ocr_engine(name: str) -> BaseOCREngine:
     from app.ocr.azure_document_intelligence import AzureDocumentIntelligenceEngine
+    from app.ocr.tesseract_ocr import TesseractOCREngine
 
     engines: dict[str, BaseOCREngine] = {
+        "tesseract": TesseractOCREngine(),
         "azure_document_intelligence": AzureDocumentIntelligenceEngine(),
     }
     try:

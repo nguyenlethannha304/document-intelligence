@@ -16,7 +16,7 @@ COPY ./pdf_requirements.txt /tmp/pdf_requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt -r /tmp/pdf_requirements.txt
 
-COPY app /app/app
+COPY ./ /app
 
 ENV PYTHONPATH=/app
 

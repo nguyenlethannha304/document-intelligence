@@ -10,7 +10,6 @@ app = FastAPI(title="Tesseract OCR Service", version="1.1.0")
 def health():
     return {"ok": True}
 
-
 @app.post("/ocr")
 async def ocr(
     file: UploadFile = File(...),
