@@ -1,6 +1,7 @@
 import pymupdf
 from langchain_core.documents import Document
 
+
 def _bboxes_intersect(a: tuple, b: tuple) -> bool:
     ax0, ay0, ax1, ay1 = a
     bx0, by0, bx1, by1 = b
@@ -19,9 +20,12 @@ def _table_to_markdown(rows: list[list]) -> str:
     lines.extend(_fmt_row(row) for row in rows[1:])
     return "\n".join(lines)
 
+
 def _convert_page_to_image(index, page) -> Document:
     pix = page.get_pixmap(dpi=150, alpha=False)
-    image_bytes = pix.tobytes("png")  # real PNG file bytes, good for multipart UploadFile
+    image_bytes = pix.tobytes(
+        "png"
+    )  # real PNG file bytes, good for multipart UploadFile
 
     return Document(
         page_content="",
@@ -35,6 +39,7 @@ def _convert_page_to_image(index, page) -> Document:
             "image_bytes": image_bytes,
         },
     )
+
 
 def extract_pdf_documents(path: str) -> list[Document]:
     """
@@ -75,7 +80,7 @@ def extract_pdf_documents(path: str) -> list[Document]:
             page_content = "\n\n".join(content_parts).strip()
 
             if not page_content:
-                documents.append(_convert_page_to_image (index, page))
+                documents.append(_convert_page_to_image(index, page))
                 continue
             documents.append(
                 Document(

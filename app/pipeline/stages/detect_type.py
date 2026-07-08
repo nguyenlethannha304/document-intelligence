@@ -11,5 +11,7 @@ def detect_document_type(state: PipelineState) -> PipelineState:
         state["document_type"] = "pdf"
     else:
         state["status"] = "error"
-        raise UnsupportedDocumentError("Only PDF documents are supported in this version.")
+        raise UnsupportedDocumentError(
+            "Only PDF documents are supported in this version."
+        )
     return state

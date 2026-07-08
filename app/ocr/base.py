@@ -1,15 +1,18 @@
-from functools import lru_cache
 from abc import ABC, abstractmethod
+from functools import lru_cache
 
 from langchain_core.documents import Document
 
 from app.core.exceptions import OCRPlatformError
 
+
 class BaseOCREngine(ABC):
     name: str
+
     @abstractmethod
     def extract_text(self, page: Document) -> Document:
         raise NotImplementedError
+
 
 @lru_cache(maxsize=2)
 def get_ocr_engine(name: str) -> BaseOCREngine:

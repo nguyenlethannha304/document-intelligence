@@ -1,7 +1,8 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from PIL import Image
-import pytesseract
 import io
+
+import pytesseract
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from PIL import Image
 
 app = FastAPI(title="Tesseract OCR Service", version="1.1.0")
 
@@ -10,12 +11,13 @@ app = FastAPI(title="Tesseract OCR Service", version="1.1.0")
 def health():
     return {"ok": True}
 
+
 @app.post("/ocr")
 async def ocr(
     file: UploadFile = File(...),
     lang: str = "eng",
     config: str = "--oem 3 --psm 6",
-    include_words: bool = False
+    include_words: bool = False,
 ):
     try:
         content = await file.read()
@@ -26,10 +28,7 @@ async def ocr(
 
         # OCR detailed data (includes confidence)
         data = pytesseract.image_to_data(
-            image,
-            lang=lang,
-            config=config,
-            output_type=pytesseract.Output.DICT
+            image, lang=lang, config=config, output_type=pytesseract.Output.DICT
         )
 
         words = []
@@ -49,18 +48,22 @@ async def ocr(
             if conf >= 0 and w:
                 confidences.append(conf)
                 if include_words:
-                    words.append({
-                        "text": w,
-                        "confidence": round(conf, 2),
-                        "bbox": {
-                            "left": int(data["left"][i]),
-                            "top": int(data["top"][i]),
-                            "width": int(data["width"][i]),
-                            "height": int(data["height"][i]),
+                    words.append(
+                        {
+                            "text": w,
+                            "confidence": round(conf, 2),
+                            "bbox": {
+                                "left": int(data["left"][i]),
+                                "top": int(data["top"][i]),
+                                "width": int(data["width"][i]),
+                                "height": int(data["height"][i]),
+                            },
                         }
-                    })
+                    )
 
-        avg_conf = round(sum(confidences) / len(confidences), 2) if confidences else None
+        avg_conf = (
+            round(sum(confidences) / len(confidences), 2) if confidences else None
+        )
 
         resp = {
             "filename": file.filename,

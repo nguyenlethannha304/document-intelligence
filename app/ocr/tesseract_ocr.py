@@ -1,7 +1,10 @@
-import requests
+import base64
 
+import requests
 from langchain_core.documents import Document
+
 from app.ocr.base import BaseOCREngine
+
 
 class TesseractOCREngine(BaseOCREngine):
     name = "tesseract"
@@ -34,6 +37,10 @@ class TesseractOCREngine(BaseOCREngine):
             page.metadata["avg_confidence"] = payload.get("avg_confidence", 0)
             if payload.get("avg_confidence", 0) > 80:
                 page.metadata["ocr_needed"] = False
+            else:
+                page.metadata["image_url"] = (
+                    f"data:image/png;base64,{base64.b64encode(image_bytes).decode('utf-8')}"
+                )
         else:
             print(f"Error during OCR: {response.status_code} - {response.text}")
         return page

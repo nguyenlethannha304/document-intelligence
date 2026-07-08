@@ -1,5 +1,5 @@
-from app.postprocess.markdown import to_markdown
 from app.pipeline.state import PipelineState
+from app.postprocess.markdown import to_markdown
 
 
 def postprocess_text(state: PipelineState) -> PipelineState:

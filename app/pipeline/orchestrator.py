@@ -1,13 +1,14 @@
 from uuid import uuid4
+
 from langgraph.graph import END, StateGraph
 
-from app.pipeline.state import PipelineState
 from app.pipeline.stages.detect_type import detect_document_type
 from app.pipeline.stages.export import export_result
 from app.pipeline.stages.extract_pages import extract_pages
 from app.pipeline.stages.ocr import run_ocr_stage
 from app.pipeline.stages.postprocess import postprocess_text
 from app.pipeline.stages.preprocess import preprocess_pages
+from app.pipeline.state import PipelineState
 
 
 class OCRPipeline:
@@ -27,7 +28,7 @@ class OCRPipeline:
         graph.add_edge("postprocess", "export")
         graph.add_edge("export", END)
         self.graph = graph.compile()
-    
+
     def run(self, source_path: str, engine: str = "tesseract") -> PipelineState:
         initial_state: PipelineState = {
             "document_id": str(uuid4()),

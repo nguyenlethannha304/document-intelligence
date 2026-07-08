@@ -1,7 +1,11 @@
+import os
 from functools import lru_cache
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -10,8 +14,13 @@ class Settings(BaseSettings):
     upload_dir: Path = Path("data/uploads")
     output_dir: Path = Path("data/outputs")
     default_ocr_engine: str = "mock"
-
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    production: bool = os.getenv("PRODUCTION", "false").lower() == "true"
+    azure_project_endpoint: str = os.getenv("AZURE_PROJECT_ENDPOINT", "")
+    llm_model: str = os.getenv("LLM_MODEL", "")
+    slm_model: str = os.getenv("SLM_MODEL", "")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
 
 @lru_cache(maxsize=1)
