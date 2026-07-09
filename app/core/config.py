@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     default_ocr_engine: str = "mock"
     production: bool = os.getenv("PRODUCTION", "false").lower() == "true"
     azure_project_endpoint: str = os.getenv("AZURE_PROJECT_ENDPOINT", "")
+    openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
     llm_model: str = os.getenv("LLM_MODEL", "")
     slm_model: str = os.getenv("SLM_MODEL", "")
     model_config = SettingsConfigDict(

@@ -11,13 +11,9 @@ class LLMOCREngine(BaseOCREngine):
 
     def __init__(self):
         if get_settings().production:
-            token_provider = get_bearer_token_provider(
-                credential=DefaultAzureCredential(),
-                scopes=["https://ai.azure.com/.default"],
-            )
             self.client = OpenAI(
-                endpoint=get_settings().azure_project_endpoint,
-                credential=token_provider,
+                base_url=get_settings().azure_project_endpoint,
+                api_key=get_settings().openai_api_key,
             )
         else:
             self.client = None
@@ -28,29 +24,38 @@ class LLMOCREngine(BaseOCREngine):
             if page.metadata.get("avg_confidence", 0) < 60
             else get_settings().slm_model
         )
-        response = self.client.chat.completions.create(
+        image_url = page.metadata.get("image_url")
+        response = self.client.responses.create(
             model=model,
-            messages=[
+            input=[
                 {
                     "role": "system",
                     "content": "You are an OCR engine that extracts text from images.",
                 },
                 {
                     "role": "user",
-                    "content": f"Extract text from the following image: {page.metadata.get('image_url')}",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": "Extract text from this image only.",
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": image_url,
+                        },
+                    ],
                 },
             ],
         )
-        extracted_text = response.choices[0].message.content
-        page.page_content = extracted_text
-        return page
+        print(response)
+        return response.output_text if response.output_text else "No text extracted."
 
     def extract_text(self, page: Document) -> Document:
         page_index = page.metadata.get("page", "unknown")
         avg_confidence = page.metadata.get("avg_confidence", 0)
-        print(
-            f"Running {get_settings().slm_model if avg_confidence > 60 else get_settings().llm_model} OCR on page {page_index}..."
-        )
+        print(f"Running AI LLM OCR on page {page_index}...")
         if self.client:
-            page = self._ai_ocr(page)
+            print(f"Actual running LLM OCR on page {page_index}...")
+            page.page_content = self._ai_ocr(page)
+            page.metadata["ocr_needed"] = False
         return page
